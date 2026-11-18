@@ -3,11 +3,21 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import pool from '../db.js';
 import { requireAuth } from '../middleware/requireAuth.js';
+import { rateLimit } from 'express-rate-limit';
 
 const router = Router();
 
 const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
 const USERNAME_RE = /^[a-zA-Z0-9_]{3,20}$/;
+
+// Máximo 20 intentos de login/registro cada 15 minutos por IP
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 20,
+  standardHeaders: 'draft-8',
+  legacyHeaders: false,
+  message: { error: 'Demasiados intentos. Espera 15 minutos e intenta de nuevo.' },
+});
 
 // Crea la "manilla" (JWT) y la guarda en una cookie
 function setSessionCookie(res, user) {
@@ -26,7 +36,7 @@ function setSessionCookie(res, user) {
 }
 
 // REGISTRO
-router.post('/register', async (req, res) => {
+router.post('/register',authLimiter, async (req, res) => {
   const { username, password } = req.body ?? {};
 
   if (typeof username !== 'string' || !USERNAME_RE.test(username)) {
@@ -54,7 +64,7 @@ router.post('/register', async (req, res) => {
 });
 
 // LOGIN
-router.post('/login', async (req, res) => {
+router.post('/login', authLimiter, async (req, res) => {
   const { username, password } = req.body ?? {};
 
   if (typeof username !== 'string' || typeof password !== 'string') {
