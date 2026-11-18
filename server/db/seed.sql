@@ -1,0 +1,22 @@
+INSERT INTO decks (name) VALUES
+  ('Dragapult ex'),
+  ('Basic Box'),
+  ('Slowking Seek Inspiration'),
+  ('N''s Zoroark ex'),
+  ('Alakazam Powerful Hand'),
+  ('Festival Lead'),
+  ('Hydrapple ex'),
+  ('Dhelmise Hide n'' Sneak'),
+  ('Crustle Mysterious Rock Inn'),
+  ('Mega Lopunny ex'),
+  ('Mega Excadrill ex'),
+  ('Mega Lucario ex'),
+  ('Rocket''s Honchkrow'),
+  ('Mega Sharpedo ex'),
+  ('Cynthia''s Garchomp ex'),
+  ('Ogerpon Meganium'),
+  ('Marnie''s Grimmsnarl ex'),
+  ('Mew Box Memory Helix'),
+  ('Rocket''s Mewtwo ex'),
+  ('Greninja ex')
+ON CONFLICT DO NOTHING;
