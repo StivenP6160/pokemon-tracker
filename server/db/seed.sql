@@ -4,8 +4,10 @@
 
 INSERT INTO decks (name, icons, limitless_id) VALUES
   ('Alakazam Dudunsparce', ARRAY['alakazam', 'dudunsparce'], 'alakazam-dudunsparce'),
+  ('Alakazam Dusknoir', ARRAY['alakazam', 'dusknoir'], 'alakazam-dusknoir'),
   ('Basic Box', ARRAY['kangaskhan-mega', 'clefairy'], 'basic-box-m'),
   ('Ceruledge', ARRAY['ceruledge'], 'ceruledge-ex'),
+  ('Cinccino', ARRAY['cinccino'], 'cinccino-ex'),
   ('Crustle', ARRAY['crustle'], 'crustle-dri'),
   ('Cynthia''s Garchomp', ARRAY['garchomp'], 'cynthia-garchomp-ex'),
   ('Dhelmise', ARRAY['dhelmise', 'banette'], 'dhelmise-pbl'),
