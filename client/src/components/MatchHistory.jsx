@@ -1,3 +1,5 @@
+import DeckIcons from './DeckIcons.jsx';
+
 const RESULT_LABELS = { win: 'Victoria', loss: 'Derrota', tie: 'Empate' };
 
 function formatDate(iso) {
@@ -17,8 +19,14 @@ export default function MatchHistory({ matches, onDelete }) {
             <li key={m.id} className="match">
               <div className="match-main">
                 <span className={`badge ${m.result}`}>{RESULT_LABELS[m.result]}</span>
-                <span>
-                  <strong>{m.my_deck}</strong> vs {m.opp_deck}
+                <span className="deck-name">
+                  <DeckIcons icons={m.my_icons} />
+                  <strong>{m.my_deck}</strong>
+                </span>
+                <span className="vs">vs</span>
+                <span className="deck-name">
+                  <DeckIcons icons={m.opp_icons} />
+                  {m.opp_deck}
                 </span>
               </div>
 

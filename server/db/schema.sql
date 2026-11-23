@@ -29,3 +29,7 @@ CREATE TABLE IF NOT EXISTS matches (
 );
 
 CREATE INDEX IF NOT EXISTS matches_user_idx ON matches (user_id, played_at DESC);
+
+-- Íconos de cada deck (nombres de Pokémon) y el id del deck en Limitless
+ALTER TABLE decks ADD COLUMN IF NOT EXISTS icons TEXT[] NOT NULL DEFAULT '{}';
+ALTER TABLE decks ADD COLUMN IF NOT EXISTS limitless_id TEXT UNIQUE;

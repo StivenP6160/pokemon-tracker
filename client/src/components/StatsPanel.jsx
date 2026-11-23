@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { api } from '../api.js';
 import DeckSelect from './DeckSelect.jsx';
+import DeckIcons from './DeckIcons.jsx';
 
-// Barra horizontal: victorias / derrotas / empates en proporción
 function RecordBar({ stats }) {
   if (stats.total === 0) return <div className="record-bar empty" />;
 
@@ -30,7 +30,6 @@ function RecordBar({ stats }) {
   );
 }
 
-// Tarjeta con el % de victorias de un grupo
 function StatTile({ title, stats }) {
   const empty = stats.total === 0;
 
@@ -54,7 +53,6 @@ export default function StatsPanel({ decks, matches }) {
   const [stats, setStats] = useState(null);
   const [error, setError] = useState('');
 
-  // Pide las estadísticas cada vez que cambian los filtros o las partidas
   useEffect(() => {
     const filters = {};
     if (myDeckId) filters.my_deck_id = myDeckId;
@@ -74,7 +72,7 @@ export default function StatsPanel({ decks, matches }) {
       });
 
     return () => {
-      active = false; // ignora respuestas viejas si cambias el filtro rápido
+      active = false;
     };
   }, [myDeckId, oppDeckId, matches]);
 
@@ -139,8 +137,18 @@ export default function StatsPanel({ decks, matches }) {
                 <tbody>
                   {stats.by_matchup.map((m) => (
                     <tr key={`${m.my_deck_id}-${m.opp_deck_id}`}>
-                      <td>{m.my_deck}</td>
-                      <td>{m.opp_deck}</td>
+                      <td>
+                        <span className="deck-name">
+                          <DeckIcons icons={m.my_icons} />
+                          {m.my_deck}
+                        </span>
+                      </td>
+                      <td>
+                        <span className="deck-name">
+                          <DeckIcons icons={m.opp_icons} />
+                          {m.opp_deck}
+                        </span>
+                      </td>
                       <td className="num">{m.total}</td>
                       <td className="num">{m.wins}-{m.losses}-{m.ties}</td>
                       <td>

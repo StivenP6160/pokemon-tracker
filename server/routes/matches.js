@@ -7,7 +7,9 @@ const RESULTS = ['win', 'loss', 'tie'];
 // Historial del usuario
 router.get('/', async (req, res) => {
   const { rows } = await pool.query(
-    `SELECT m.id, m.my_deck_id, mine.name AS my_deck, m.opp_deck_id, opp.name AS opp_deck,
+    `SELECT m.id,
+            m.my_deck_id, mine.name AS my_deck, mine.icons AS my_icons,
+            m.opp_deck_id, opp.name AS opp_deck, opp.icons AS opp_icons,
             m.went_first, m.result, m.notes, m.played_at
        FROM matches m
        JOIN decks mine ON mine.id = m.my_deck_id
@@ -36,7 +38,6 @@ router.post('/', async (req, res) => {
     return res.status(400).json({ error: 'Las notas deben ser texto de máximo 2000 caracteres' });
   }
 
-  // Los decks deben existir y ser globales o del usuario
   const ids = [...new Set([my_deck_id, opp_deck_id])];
   const { rows: visible } = await pool.query(
     'SELECT id FROM decks WHERE id = ANY($1) AND (user_id IS NULL OR user_id = $2)',

@@ -144,3 +144,9 @@ textarea { resize: vertical; min-height: 70px; }
 @media (max-width: 600px) {
   .stats-filters, .stat-tiles { grid-template-columns: 1fr; }
 }
+
+/* ---------- Íconos de Pokémon ---------- */
+.deck-name { display: inline-flex; align-items: center; gap: 4px; }
+.deck-icons { display: inline-flex; align-items: center; }
+.deck-icons img { width: 40px; height: 40px; margin: -8px -6px; image-rendering: pixelated; }
+.vs { color: var(--muted); font-size: 0.85rem; }

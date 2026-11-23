@@ -6,7 +6,7 @@ const router = Router();
 // Lista los decks globales + los propios del usuario
 router.get('/', async (req, res) => {
   const { rows } = await pool.query(
-    `SELECT id, name, format, user_id IS NOT NULL AS is_custom
+    `SELECT id, name, format, icons, user_id IS NOT NULL AS is_custom
        FROM decks
       WHERE user_id IS NULL OR user_id = $1
       ORDER BY is_custom, name`,
@@ -23,7 +23,6 @@ router.post('/', async (req, res) => {
     return res.status(400).json({ error: 'El nombre del deck debe tener entre 2 y 50 caracteres' });
   }
 
-  // ¿Ya existe un deck con ese nombre (sin importar mayúsculas)?
   const { rows: existing } = await pool.query(
     `SELECT id, name FROM decks
       WHERE lower(name) = lower($1) AND (user_id IS NULL OR user_id = $2)`,
@@ -35,10 +34,10 @@ router.post('/', async (req, res) => {
 
   const { rows } = await pool.query(
     `INSERT INTO decks (name, user_id) VALUES ($1, $2)
-     RETURNING id, name, format, true AS is_custom`,
+     RETURNING id, name, format, icons, true AS is_custom`,
     [name, req.user.id]
   );
   res.status(201).json({ deck: rows[0] });
 });
 
-export default router;
+export default router;  
