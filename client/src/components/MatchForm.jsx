@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import NewDeckForm from './NewDeckForm.jsx';
-import DeckSelect from './DeckSelect.jsx';
+import DeckPicker from './DeckPicker.jsx';
 
 const RESULTS = [
   { value: 'win', label: 'Victoria' },
@@ -8,10 +7,12 @@ const RESULTS = [
   { value: 'tie', label: 'Empate' },
 ];
 
-export default function MatchForm({ decks, onSubmit, onCreateDeck }) {
-  const [myDeckId, setMyDeckId] = useState('');
-  const [oppDeckId, setOppDeckId] = useState('');
-  const [wentFirst, setWentFirst] = useState(null); // null = aún no elegido
+const EMPTY = ['', ''];
+
+export default function MatchForm({ decks, onSubmit }) {
+  const [myIcons, setMyIcons] = useState(EMPTY);
+  const [oppIcons, setOppIcons] = useState(EMPTY);
+  const [wentFirst, setWentFirst] = useState(null);
   const [result, setResult] = useState(null);
   const [notes, setNotes] = useState('');
   const [error, setError] = useState('');
@@ -21,21 +22,20 @@ export default function MatchForm({ decks, onSubmit, onCreateDeck }) {
     e.preventDefault();
     setError('');
 
-    if (!myDeckId || !oppDeckId) return setError('Elige tu deck y el del rival');
+    const mine = myIcons.filter(Boolean);
+    const opp = oppIcons.filter(Boolean);
+
+    if (mine.length === 0 || opp.length === 0) {
+      return setError('Elige al menos un Pokémon para tu deck y para el del rival');
+    }
     if (wentFirst === null) return setError('Indica si fuiste primero o segundo');
     if (!result) return setError('Elige el resultado');
 
     setSending(true);
     try {
-      await onSubmit({
-        my_deck_id: Number(myDeckId),
-        opp_deck_id: Number(oppDeckId),
-        went_first: wentFirst,
-        result,
-        notes,
-      });
+      await onSubmit({ myIcons: mine, oppIcons: opp, went_first: wentFirst, result, notes });
       // Limpia el formulario, pero deja tu deck (normalmente juegas el mismo)
-      setOppDeckId('');
+      setOppIcons(EMPTY);
       setWentFirst(null);
       setResult(null);
       setNotes('');
@@ -51,10 +51,8 @@ export default function MatchForm({ decks, onSubmit, onCreateDeck }) {
       <h2>Registrar partida</h2>
 
       <form className="match-form" onSubmit={handleSubmit}>
-        <div className="row">
-          <DeckSelect label="Mi deck" value={myDeckId} onChange={setMyDeckId} decks={decks} />
-          <DeckSelect label="Deck rival" value={oppDeckId} onChange={setOppDeckId} decks={decks} />
-        </div>
+        <DeckPicker label="Mi deck" icons={myIcons} onChange={setMyIcons} decks={decks} />
+        <DeckPicker label="Deck rival" icons={oppIcons} onChange={setOppIcons} decks={decks} />
 
         <fieldset>
           <legend>Turno</legend>
@@ -108,8 +106,6 @@ export default function MatchForm({ decks, onSubmit, onCreateDeck }) {
           {sending ? 'Guardando...' : 'Guardar partida'}
         </button>
       </form>
-
-      <NewDeckForm onCreate={onCreateDeck} />
     </section>
   );
 }

@@ -26,6 +26,7 @@ export const api = {
   logout: () => request('/auth/logout', { method: 'POST' }),
   getDecks: () => request('/decks'),
   createDeck: (name) => request('/decks', { method: 'POST', body: { name } }),
+  resolveDeck: (icons) => request('/decks/resolve', { method: 'POST', body: { icons } }),
   getMatches: () => request('/matches'),
   createMatch: (match) => request('/matches', { method: 'POST', body: match }),
   deleteMatch: (id) => request(`/matches/${id}`, { method: 'DELETE' }),

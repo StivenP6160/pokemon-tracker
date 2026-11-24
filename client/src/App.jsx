@@ -33,9 +33,25 @@ export default function App() {
       .catch((err) => setLoadError(err.message));
   }, [user]);
 
-  async function handleCreateMatch(match) {
-    await api.createMatch(match);
-    const data = await api.getMatches(); // recarga para traer los nombres de los decks
+  async function handleCreateMatch({ myIcons, oppIcons, ...rest }) {
+    // 1. Convertir los Pokémon elegidos en decks (los encuentra o los crea)
+    const [mine, opp] = await Promise.all([
+      api.resolveDeck(myIcons),
+      api.resolveDeck(oppIcons),
+    ]);
+
+    // 2. Si se creó un deck nuevo, agregarlo a la lista (para los filtros de estadísticas)
+    for (const r of [mine, opp]) {
+      if (r.created) {
+        setDecks((prev) => (prev.some((d) => d.id === r.deck.id) ? prev : [...prev, r.deck]));
+      }
+    }
+
+    // 3. Guardar la partida con los ids de esos decks
+    await api.createMatch({ my_deck_id: mine.deck.id, opp_deck_id: opp.deck.id, ...rest });
+
+    // 4. Recargar el historial
+    const data = await api.getMatches();
     setMatches(data.matches);
   }
 
@@ -49,12 +65,6 @@ export default function App() {
     } catch (err) {
       alert(err.message);
     }
-  }
-
-  async function handleCreateDeck(name) {
-    const data = await api.createDeck(name);
-    setDecks((prev) => [...prev, data.deck]);
-    return data.deck;
   }
 
   async function handleLogout() {
@@ -84,7 +94,7 @@ export default function App() {
       {loadError && <p className="error">{loadError}</p>}
 
       <div className="layout">
-        <MatchForm decks={decks} onSubmit={handleCreateMatch} onCreateDeck={handleCreateDeck} />
+        <MatchForm decks={decks} onSubmit={handleCreateMatch} />
         <StatsPanel decks={decks} matches={matches} />
         <MatchHistory matches={matches} onDelete={handleDeleteMatch} />
       </div>

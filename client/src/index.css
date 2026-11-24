@@ -150,3 +150,66 @@ textarea { resize: vertical; min-height: 70px; }
 .deck-icons { display: inline-flex; align-items: center; }
 .deck-icons img { width: 40px; height: 40px; margin: -8px -6px; image-rendering: pixelated; }
 .vs { color: var(--muted); font-size: 0.85rem; }
+
+/* ---------- Buscador de Pokémon ---------- */
+.picker { position: relative; }
+
+.picker-button,
+.picker-selected {
+  width: 100%;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font: inherit;
+}
+.picker-button { justify-content: space-between; font-weight: 500; cursor: pointer; }
+.picker-chevron { color: var(--muted); }
+.picker-selected span { flex: 1; }
+.picker-clear { background: none; color: var(--muted); padding: 0 4px; font-size: 1.3rem; font-weight: 400; }
+
+.picker-selected img,
+.picker-list img { width: 40px; height: 40px; margin: -6px -4px; image-rendering: pixelated; }
+
+.picker-popover {
+  position: absolute;
+  z-index: 10;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+}
+.picker-popover input { width: 100%; border: none; border-bottom: 1px solid var(--border); border-radius: 0; }
+.picker-hint { margin: 0; padding: 20px 12px; text-align: center; color: var(--muted); font-size: 0.9rem; }
+
+.picker-list { list-style: none; margin: 0; padding: 4px; max-height: 280px; overflow-y: auto; }
+.picker-list button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: none;
+  color: var(--text);
+  font-weight: 500;
+  text-align: left;
+  border-radius: 6px;
+}
+.picker-list button:hover,
+.picker-list button:focus { background: var(--border); outline: none; }
+
+/* ---------- Elegir deck con Pokémon ---------- */
+.deck-picker { border: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 6px; }
+.deck-preview { margin: 0; font-size: 0.85rem; color: var(--muted); }
+.deck-preview strong { color: var(--text); }
+
+.picker-list button.active { background: var(--border); }
