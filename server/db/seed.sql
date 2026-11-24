@@ -1,4 +1,4 @@
--- Archivo generado con: npm run seed:export (2026-11-23)
+-- Archivo generado con: npm run seed:export (2026-11-24)
 -- Decks iniciales tomados de Limitless. No lo edites a mano:
 -- corre npm run meta:sync y luego npm run seed:export.
 
@@ -14,11 +14,14 @@ INSERT INTO decks (name, icons, limitless_id) VALUES
   ('Dragapult', ARRAY['dragapult'], 'dragapult-ex'),
   ('Dragapult Blaziken', ARRAY['dragapult', 'blaziken'], 'dragapult-blaziken'),
   ('Dragapult Dudunsparce', ARRAY['dragapult', 'dudunsparce'], 'dragapult-dudunsparce'),
+  ('Dragapult Dusknoir', ARRAY['dragapult', 'dusknoir'], 'dragapult-dusknoir'),
   ('Ethan''s Typhlosion', ARRAY['typhlosion'], 'ethan-typhlosion'),
   ('Festival Lead', ARRAY['dipplin', 'thwackey'], 'festival-lead'),
   ('Greninja', ARRAY['greninja'], 'greninja-ex'),
   ('Igglybuff', ARRAY['igglybuff'], 'igglybuff-30c'),
+  ('Kangaskhan Bouffalant', ARRAY['kangaskhan-mega', 'bouffalant'], 'kangaskhan-bouffalant'),
   ('Lopunny Dudunsparce', ARRAY['lopunny-mega', 'dudunsparce'], 'lopunny-dudunsparce'),
+  ('Lucario Hariyama', ARRAY['lucario-mega', 'hariyama'], 'lucario-hariyama'),
   ('Manectric Eelektrik', ARRAY['manectric-mega', 'eelektrik'], 'manectric-eelektrik'),
   ('Mega Charizard Y', ARRAY['charizard-mega-y'], 'mega-charizard-y-ex'),
   ('Mega Excadrill', ARRAY['excadrill-mega'], 'mega-excadrill-ex'),

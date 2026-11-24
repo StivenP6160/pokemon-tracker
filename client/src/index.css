@@ -213,3 +213,15 @@ textarea { resize: vertical; min-height: 70px; }
 .deck-preview strong { color: var(--text); }
 
 .picker-list button.active { background: var(--border); }
+
+/* ---------- Comparación con el meta ---------- */
+.meta-box { border-top: 1px solid var(--border); padding-top: 16px; margin-bottom: 24px; display: flex; flex-direction: column; gap: 8px; }
+.meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.meta-diff { margin: 0; font-weight: 600; }
+.meta-diff.up { color: var(--win); }
+.meta-diff.down { color: var(--loss); }
+.small { font-size: 0.8rem; }
+
+@media (max-width: 600px) {
+  .meta-grid { grid-template-columns: 1fr; }
+}

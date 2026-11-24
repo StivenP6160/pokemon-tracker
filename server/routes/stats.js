@@ -16,8 +16,35 @@ function withRates(row) {
   return { ...row, win_rate: pct(row.wins), loss_rate: pct(row.losses), tie_rate: pct(row.ties) };
 }
 
+// Busca el matchup del meta entre dos decks (por su id de Limitless)
+async function getMetaMatchup(myDeckId, oppDeckId) {
+  const { rows } = await pool.query(
+    `SELECT mm.wins, mm.losses, mm.ties, mm.updated_at,
+            a.limitless_id = b.limitless_id AS mirror
+       FROM decks a
+       JOIN decks b ON b.id = $2
+       JOIN meta_matchups mm ON mm.deck_a = a.limitless_id AND mm.deck_b = b.limitless_id
+      WHERE a.id = $1`,
+    [myDeckId, oppDeckId]
+  );
+  if (rows.length === 0) return null; // algún deck no es de Limitless, o no hay datos
+
+  const r = rows[0];
+  // En un espejo cada partida se anotó dos veces en la misma fila: dividimos entre 2
+  const div = r.mirror ? 2 : 1;
+  const wins = r.wins / div;
+  const losses = r.losses / div;
+  const ties = r.ties / div;
+
+  return {
+    ...withRates({ total: wins + losses + ties, wins, losses, ties }),
+    updated_at: r.updated_at,
+  };
+}
+
 router.get('/', async (req, res) => {
   const params = [req.user.id];
+  const filters = {};
   let where = 'm.user_id = $1';
 
   for (const field of ['my_deck_id', 'opp_deck_id']) {
@@ -28,6 +55,7 @@ router.get('/', async (req, res) => {
     if (!Number.isInteger(id)) {
       return res.status(400).json({ error: `${field} debe ser un número` });
     }
+    filters[field] = id;
     params.push(id);
     where += ` AND m.${field} = $${params.length}`;
   }
@@ -54,6 +82,12 @@ router.get('/', async (req, res) => {
     params
   );
 
+  // El dato del meta solo tiene sentido con un matchup concreto (los dos filtros)
+  const meta =
+    filters.my_deck_id && filters.opp_deck_id
+      ? await getMetaMatchup(filters.my_deck_id, filters.opp_deck_id)
+      : null;
+
   const first  = byTurn.rows.find((r) => r.went_first === true)  ?? EMPTY;
   const second = byTurn.rows.find((r) => r.went_first === false) ?? EMPTY;
 
@@ -62,6 +96,7 @@ router.get('/', async (req, res) => {
     going_first: withRates(first),
     going_second: withRates(second),
     by_matchup: byMatchup.rows.map(withRates),
+    meta,
   });
 });
 

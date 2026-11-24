@@ -47,6 +47,52 @@ function StatTile({ title, stats }) {
   );
 }
 
+// Compara tu % de victorias en un matchup con el del meta
+function MetaComparison({ mine, meta }) {
+  if (!meta) {
+    return (
+      <div className="meta-box">
+        <h3 className="subtitle">Comparación con el meta</h3>
+        <p className="muted">
+          Sin datos del meta para este matchup: alguno de los dos decks no es un deck de Limitless,
+          o no se jugó en los torneos recientes.
+        </p>
+      </div>
+    );
+  }
+
+  const diff = Math.round((mine.win_rate - meta.win_rate) * 10) / 10;
+  const updated = new Date(meta.updated_at).toLocaleDateString('es-CO', { dateStyle: 'medium' });
+
+  return (
+    <div className="meta-box">
+      <h3 className="subtitle">Comparación con el meta</h3>
+
+      <div className="meta-grid">
+        <StatTile title="Tú" stats={mine} />
+        <StatTile title="Meta · torneos online de Limitless" stats={meta} />
+      </div>
+
+      {mine.total > 0 && (
+        <p className={`meta-diff ${diff > 0 ? 'up' : diff < 0 ? 'down' : ''}`}>
+          {diff > 0 && `▲ ${diff} puntos por encima del meta`}
+          {diff < 0 && `▼ ${Math.abs(diff)} puntos por debajo del meta`}
+          {diff === 0 && 'Igual que el meta'}
+        </p>
+      )}
+
+      {mine.total > 0 && mine.total < 10 && (
+        <p className="muted small">
+          Tienes pocas partidas en este matchup ({mine.total}): tu porcentaje puede cambiar mucho con
+          cada resultado.
+        </p>
+      )}
+
+      <p className="muted small">Datos del meta actualizados el {updated}.</p>
+    </div>
+  );
+}
+
 export default function StatsPanel({ decks, matches }) {
   const [myDeckId, setMyDeckId] = useState('');
   const [oppDeckId, setOppDeckId] = useState('');
@@ -116,6 +162,8 @@ export default function StatsPanel({ decks, matches }) {
             <StatTile title="Yendo primero" stats={stats.going_first} />
             <StatTile title="Yendo segundo" stats={stats.going_second} />
           </div>
+
+          {myDeckId && oppDeckId && <MetaComparison mine={stats.overall} meta={stats.meta} />}
 
           <h3 className="subtitle">Matchups</h3>
 

@@ -33,3 +33,15 @@ CREATE INDEX IF NOT EXISTS matches_user_idx ON matches (user_id, played_at DESC)
 -- Íconos de cada deck (nombres de Pokémon) y el id del deck en Limitless
 ALTER TABLE decks ADD COLUMN IF NOT EXISTS icons TEXT[] NOT NULL DEFAULT '{}';
 ALTER TABLE decks ADD COLUMN IF NOT EXISTS limitless_id TEXT UNIQUE;
+
+-- Matchups del meta calculados desde Limitless.
+-- Cada partida se guarda en las dos direcciones: A vs B y B vs A.
+CREATE TABLE IF NOT EXISTS meta_matchups (
+  deck_a     TEXT NOT NULL,
+  deck_b     TEXT NOT NULL,
+  wins       INTEGER NOT NULL DEFAULT 0,
+  losses     INTEGER NOT NULL DEFAULT 0,
+  ties       INTEGER NOT NULL DEFAULT 0,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  PRIMARY KEY (deck_a, deck_b)
+);
