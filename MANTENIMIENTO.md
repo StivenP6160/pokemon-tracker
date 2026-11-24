@@ -40,6 +40,7 @@ DATABASE_URL="$NEON_URL" node scripts/sync-meta.js   # 5. actualiza los decks en
 
 - La cadena de Neon se copia en neon.com → proyecto → **Connect**. Hay que cambiarle `sslmode=require` por `sslmode=verify-full`.
 - Si cambia el formato después de una rotación, revisar la línea `const FORMAT = ...` en `server/scripts/sync-meta.js`.
+- `meta:sync` también recalcula los matchups del meta (tabla `meta_matchups`). Conviene correrlo cada semana, aunque no cambie el meta, para tener datos frescos.
 
 ## Subir cambios a producción
 
@@ -69,7 +70,7 @@ Los cambios van en `server/db/schema.sql`. Render los aplica solo al arrancar.
 | --- | --- |
 | `npm run dev` | Enciende el backend en local |
 | `npm run db:setup` | Crea las tablas y carga los decks iniciales |
-| `npm run meta:sync` | Trae los decks del meta desde Limitless |
+| `npm run meta:sync` | Trae los decks del meta y recalcula los matchups desde Limitless |
 | `npm run seed:export` | Genera `db/seed.sql` desde la BD |
 | `npm run pokedex:build` | Descarga los sprites de todos los Pokémon |
 
