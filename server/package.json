@@ -9,7 +9,6 @@
     "dev": "node --env-file=.env --watch index.js",
     "meta:sync": "node --env-file=.env scripts/sync-meta.js",
     "seed:export": "node --env-file=.env scripts/export-seed.js",
-    "sprites:download": "node --env-file=.env scripts/download-sprites.js",
     "pokedex:build": "node --env-file=.env scripts/build-pokedex.js"
   },
   "keywords": [],

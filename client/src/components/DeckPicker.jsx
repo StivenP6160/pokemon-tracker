@@ -1,4 +1,5 @@
-import PokemonPicker, { prettyName } from './PokemonPicker.jsx';
+import PokemonPicker from './PokemonPicker.jsx';
+import { prettyName } from '../utils/pokemon.js';
 
 // ¿Tienen los mismos Pokémon, sin importar el orden?
 function sameSet(a, b) {

@@ -15,31 +15,6 @@ router.get('/', async (req, res) => {
   res.json({ decks: rows });
 });
 
-// Crea un deck propio
-router.post('/', async (req, res) => {
-  const name = typeof req.body?.name === 'string' ? req.body.name.trim() : '';
-
-  if (name.length < 2 || name.length > 50) {
-    return res.status(400).json({ error: 'El nombre del deck debe tener entre 2 y 50 caracteres' });
-  }
-
-  const { rows: existing } = await pool.query(
-    `SELECT id, name FROM decks
-      WHERE lower(name) = lower($1) AND (user_id IS NULL OR user_id = $2)`,
-    [name, req.user.id]
-  );
-  if (existing.length > 0) {
-    return res.status(409).json({ error: 'Ese deck ya existe', deck: existing[0] });
-  }
-
-  const { rows } = await pool.query(
-    `INSERT INTO decks (name, user_id) VALUES ($1, $2)
-     RETURNING id, name, format, icons, true AS is_custom`,
-    [name, req.user.id]
-  );
-  res.status(201).json({ deck: rows[0] });
-});
-
 // Encuentra el deck de 1 o 2 Pokémon, o lo crea si no existe
 router.post('/resolve', async (req, res) => {
   const icons = req.body?.icons;

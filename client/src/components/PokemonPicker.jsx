@@ -1,15 +1,8 @@
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import POKEMON from '../data/pokemon.json';
+import { prettyName } from '../utils/pokemon.js';
 
 const MAX_RESULTS = 30;
-
-// "charizard-mega-y" → "Charizard Mega Y"
-export function prettyName(slug) {
-  return slug
-    .split('-')
-    .map((w) => w[0].toUpperCase() + w.slice(1))
-    .join(' ');
-}
 
 export default function PokemonPicker({ value, onChange, placeholder = 'Elegir Pokémon...' }) {
   const [open, setOpen] = useState(false);

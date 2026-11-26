@@ -8,24 +8,23 @@ try {
   // 1. Crear un usuario de prueba
   const user = await client.query(
     'INSERT INTO users (username, password_hash) VALUES ($1, $2) RETURNING id, username',
-    ['john_test', 'hash-falso']
+    ['test_db_user', 'hash-falso']
   );
   const userId = user.rows[0].id;
   console.log('Usuario creado:', user.rows[0]);
 
-  // 2. Buscar los ids de dos decks
+  // 2. Tomar dos decks globales cualquiera
   const decks = await client.query(
-    'SELECT id, name FROM decks WHERE name IN ($1, $2)',
-    ['Alakazam Powerful Hand', 'Dragapult ex']
+    'SELECT id, name FROM decks WHERE user_id IS NULL ORDER BY name LIMIT 2'
   );
-  const alakazam  = decks.rows.find((d) => d.name === 'Alakazam Powerful Hand').id;
-  const dragapult = decks.rows.find((d) => d.name === 'Dragapult ex').id;
+  if (decks.rows.length < 2) throw new Error('Se necesitan al menos 2 decks globales. Corre npm run db:setup');
+  const [deckA, deckB] = decks.rows;
 
   // 3. Guardar una partida
   await client.query(
     `INSERT INTO matches (user_id, my_deck_id, opp_deck_id, went_first, result, notes)
      VALUES ($1, $2, $3, $4, $5, $6)`,
-    [userId, alakazam, dragapult, true, 'win', 'Partida de prueba']
+    [userId, deckA.id, deckB.id, true, 'win', 'Partida de prueba']
   );
 
   // 4. Leer el historial con los NOMBRES de los decks
@@ -44,7 +43,7 @@ try {
     await client.query(
       `INSERT INTO matches (user_id, my_deck_id, opp_deck_id, went_first, result)
        VALUES ($1, $2, $3, $4, $5)`,
-      [userId, alakazam, dragapult, false, 'ganamos']
+      [userId, deckA.id, deckB.id, false, 'ganamos']
     );
     console.log('❌ La BD aceptó un resultado inválido (algo está mal)');
   } catch (err) {
