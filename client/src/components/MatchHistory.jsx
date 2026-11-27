@@ -6,10 +6,10 @@ function formatDate(iso) {
   return new Date(iso).toLocaleString('es-CO', { dateStyle: 'medium', timeStyle: 'short' });
 }
 
-export default function MatchHistory({ matches, onDelete }) {
+export default function MatchHistory({ deckName, matches, onDelete }) {
   return (
     <section className="card">
-      <h2>Historial ({matches.length})</h2>
+      <h2>Historial{deckName ? ` · ${deckName}` : ''} ({matches.length})</h2>
 
       {matches.length === 0 ? (
         <p className="muted">Aún no has registrado partidas.</p>

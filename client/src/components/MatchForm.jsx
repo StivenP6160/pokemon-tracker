@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import DeckIcons from './DeckIcons.jsx';
 import DeckPicker from './DeckPicker.jsx';
 
 const RESULTS = [
@@ -9,8 +10,7 @@ const RESULTS = [
 
 const EMPTY = ['', ''];
 
-export default function MatchForm({ decks, onSubmit }) {
-  const [myIcons, setMyIcons] = useState(EMPTY);
+export default function MatchForm({ activeDeck, decks, onSubmit }) {
   const [oppIcons, setOppIcons] = useState(EMPTY);
   const [wentFirst, setWentFirst] = useState(null);
   const [result, setResult] = useState(null);
@@ -24,20 +24,15 @@ export default function MatchForm({ decks, onSubmit }) {
     setError('');
     setSaved(false);
 
-    const mine = myIcons.filter(Boolean);
     const opp = oppIcons.filter(Boolean);
-
-    if (mine.length === 0 || opp.length === 0) {
-      return setError('Elige al menos un Pokémon para tu deck y para el del rival');
-    }
+    if (opp.length === 0) return setError('Elige al menos un Pokémon del deck rival');
     if (wentFirst === null) return setError('Indica si fuiste primero o segundo');
     if (!result) return setError('Elige el resultado');
 
     setSending(true);
     try {
-      await onSubmit({ myIcons: mine, oppIcons: opp, went_first: wentFirst, result, notes });
+      await onSubmit({ oppIcons: opp, went_first: wentFirst, result, notes });
       setSaved(true);
-      // Limpia el formulario, pero deja tu deck (normalmente juegas el mismo)
       setOppIcons(EMPTY);
       setWentFirst(null);
       setResult(null);
@@ -49,12 +44,28 @@ export default function MatchForm({ decks, onSubmit }) {
     }
   }
 
+  if (!activeDeck) {
+    return (
+      <section className="card">
+        <h2>Registrar partida</h2>
+        <p className="muted">Elige o crea tu deck en el selector de arriba para empezar a registrar partidas.</p>
+      </section>
+    );
+  }
+
   return (
     <section className="card">
       <h2>Registrar partida</h2>
 
       <form className="match-form" onSubmit={handleSubmit}>
-        <DeckPicker label="Mi deck" icons={myIcons} onChange={setMyIcons} decks={decks} />
+        <div className="playing-with">
+          <span className="muted">Jugando con</span>
+          <span className="deck-name">
+            <DeckIcons icons={activeDeck.icons} />
+            <strong>{activeDeck.name}</strong>
+          </span>
+        </div>
+
         <DeckPicker label="Deck rival" icons={oppIcons} onChange={setOppIcons} decks={decks} />
 
         <fieldset>

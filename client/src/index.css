@@ -105,7 +105,7 @@ textarea { resize: vertical; min-height: 70px; }
 /* ---------- Fase 4.3 ---------- */
 .subtitle { margin: 0 0 10px; font-size: 1rem; }
 
-.stats-filters { display: grid; grid-template-columns: 1fr 1fr auto; gap: 12px; align-items: end; margin-bottom: 16px; }
+.stats-filters { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: end; margin-bottom: 16px; }
 .stats-filters button:disabled { cursor: default; opacity: 0.4; }
 
 .legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 0.85rem; color: var(--muted); margin-bottom: 12px; }
@@ -331,3 +331,5 @@ img { max-width: 100%; }
   .switcher { order: 3; flex-basis: 100%; max-width: none; }
   .switcher-popover { min-width: 0; }
 }
+
+.playing-with { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }

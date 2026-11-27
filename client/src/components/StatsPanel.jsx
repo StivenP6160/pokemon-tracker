@@ -1,6 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { api } from '../api.js';
-import DeckSelect from './DeckSelect.jsx';
 import DeckIcons from './DeckIcons.jsx';
 
 function RecordBar({ stats }) {
@@ -93,15 +92,27 @@ function MetaComparison({ mine, meta }) {
   );
 }
 
-export default function StatsPanel({ decks, matches }) {
-  const [myDeckId, setMyDeckId] = useState('');
+export default function StatsPanel({ activeDeck, matches }) {
   const [oppDeckId, setOppDeckId] = useState('');
   const [stats, setStats] = useState(null);
   const [error, setError] = useState('');
 
+  const deckId = activeDeck?.id;
+
+  // Los rivales contra los que ha jugado este deck, sin repetir
+  const rivals = useMemo(() => {
+    const byId = new Map();
+    for (const m of matches) {
+      if (m.my_deck_id === deckId) byId.set(m.opp_deck_id, { id: m.opp_deck_id, name: m.opp_deck });
+    }
+    return [...byId.values()].sort((a, b) => a.name.localeCompare(b.name));
+  }, [matches, deckId]);
+
+  // Pide las estadísticas de tu deck activo (y del rival, si filtraste uno)
   useEffect(() => {
-    const filters = {};
-    if (myDeckId) filters.my_deck_id = myDeckId;
+    if (!deckId) return;
+
+    const filters = { my_deck_id: deckId };
     if (oppDeckId) filters.opp_deck_id = oppDeckId;
 
     let active = true;
@@ -120,29 +131,35 @@ export default function StatsPanel({ decks, matches }) {
     return () => {
       active = false;
     };
-  }, [myDeckId, oppDeckId, matches]);
+  }, [deckId, oppDeckId, matches]);
 
-  function showMatchup(m) {
-    setMyDeckId(String(m.my_deck_id));
-    setOppDeckId(String(m.opp_deck_id));
+  if (!activeDeck) {
+    return (
+      <section className="card">
+        <h2>Estadísticas</h2>
+        <p className="muted">Elige o crea tu deck en el selector de arriba para ver tus estadísticas.</p>
+      </section>
+    );
   }
-
-  function clearFilters() {
-    setMyDeckId('');
-    setOppDeckId('');
-  }
-
-  const hasFilters = myDeckId || oppDeckId;
 
   return (
     <section className="card">
-      <h2>Estadísticas</h2>
+      <h2>Estadísticas · {activeDeck.name}</h2>
 
       <div className="stats-filters">
-        <DeckSelect label="Mi deck" value={myDeckId} onChange={setMyDeckId} decks={decks} placeholder="Todos" />
-        <DeckSelect label="Deck rival" value={oppDeckId} onChange={setOppDeckId} decks={decks} placeholder="Todos" />
-        <button type="button" className="btn-secondary" onClick={clearFilters} disabled={!hasFilters}>
-          Quitar filtros
+        <label>
+          Deck rival
+          <select value={oppDeckId} onChange={(e) => setOppDeckId(e.target.value)}>
+            <option value="">Todos</option>
+            {rivals.map((r) => (
+              <option key={r.id} value={r.id}>
+                {r.name}
+              </option>
+            ))}
+          </select>
+        </label>
+        <button type="button" className="btn-secondary" onClick={() => setOppDeckId('')} disabled={!oppDeckId}>
+          Quitar filtro
         </button>
       </div>
 
@@ -163,18 +180,17 @@ export default function StatsPanel({ decks, matches }) {
             <StatTile title="Yendo segundo" stats={stats.going_second} />
           </div>
 
-          {myDeckId && oppDeckId && <MetaComparison mine={stats.overall} meta={stats.meta} />}
+          {oppDeckId && <MetaComparison mine={stats.overall} meta={stats.meta} />}
 
           <h3 className="subtitle">Matchups</h3>
 
           {stats.by_matchup.length === 0 ? (
-            <p className="muted">No hay partidas con estos filtros.</p>
+            <p className="muted">No hay partidas con este deck todavía.</p>
           ) : (
             <div className="table-wrap">
               <table className="matchup-table">
                 <thead>
                   <tr>
-                    <th>Mi deck</th>
                     <th>Rival</th>
                     <th>Partidas</th>
                     <th>V-D-E</th>
@@ -184,13 +200,7 @@ export default function StatsPanel({ decks, matches }) {
                 </thead>
                 <tbody>
                   {stats.by_matchup.map((m) => (
-                    <tr key={`${m.my_deck_id}-${m.opp_deck_id}`}>
-                      <td>
-                        <span className="deck-name">
-                          <DeckIcons icons={m.my_icons} />
-                          {m.my_deck}
-                        </span>
-                      </td>
+                    <tr key={m.opp_deck_id}>
                       <td>
                         <span className="deck-name">
                           <DeckIcons icons={m.opp_icons} />
@@ -206,7 +216,7 @@ export default function StatsPanel({ decks, matches }) {
                         </div>
                       </td>
                       <td>
-                        <button type="button" className="link" onClick={() => showMatchup(m)}>
+                        <button type="button" className="link" onClick={() => setOppDeckId(String(m.opp_deck_id))}>
                           Ver
                         </button>
                       </td>

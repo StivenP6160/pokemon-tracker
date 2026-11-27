@@ -99,17 +99,11 @@ export default function App() {
     if (deck.id === activeDeckId) setActiveDeckId(list[0]?.id ?? null);
   }
 
-  async function handleCreateMatch({ myIcons, oppIcons, ...rest }) {
-    const [mine, opp] = await Promise.all([
-      api.resolveDeck(myIcons),
-      api.resolveDeck(oppIcons),
-    ]);
+  async function handleCreateMatch({ oppIcons, ...rest }) {
+    const opp = await api.resolveDeck(oppIcons);
+    if (opp.created) addToDeckList(opp.deck);
 
-    for (const r of [mine, opp]) {
-      if (r.created) addToDeckList(r.deck);
-    }
-
-    await api.createMatch({ my_deck_id: mine.deck.id, opp_deck_id: opp.deck.id, ...rest });
+    await api.createMatch({ my_deck_id: activeDeckId, opp_deck_id: opp.deck.id, ...rest });
 
     const data = await api.getMatches();
     setMatches(data.matches);
@@ -172,9 +166,24 @@ export default function App() {
 
       <main className="layout">
         <Routes>
-          <Route path="/" element={<StatsPanel decks={decks} matches={matches} />} />
-          <Route path="/partidas" element={<MatchForm decks={decks} onSubmit={handleCreateMatch} />} />
-          <Route path="/historial" element={<MatchHistory matches={matches} onDelete={handleDeleteMatch} />} />
+          <Route
+            path="/"
+            element={<StatsPanel key={activeDeckId} activeDeck={activeDeck} matches={matches} />}
+          />
+          <Route
+            path="/partidas"
+            element={<MatchForm key={activeDeckId} activeDeck={activeDeck} decks={decks} onSubmit={handleCreateMatch} />}
+          />
+          <Route
+            path="/historial"
+            element={
+              <MatchHistory
+                deckName={activeDeck?.name}
+                matches={matches.filter((m) => m.my_deck_id === activeDeckId)}
+                onDelete={handleDeleteMatch}
+              />
+            }
+          />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
