@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { NavLink, Navigate, Route, Routes, useNavigate } from 'react-router';
 import { api } from './api.js';
 import AuthForm from './components/AuthForm.jsx';
 import MatchForm from './components/MatchForm.jsx';
@@ -11,6 +12,7 @@ export default function App() {
   const [decks, setDecks] = useState([]);
   const [matches, setMatches] = useState([]);
   const [loadError, setLoadError] = useState('');
+  const navigate = useNavigate();
 
   // 1. Al abrir la página: ¿ya había una sesión iniciada?
   useEffect(() => {
@@ -33,24 +35,26 @@ export default function App() {
       .catch((err) => setLoadError(err.message));
   }, [user]);
 
+  // Después del login, siempre a la pantalla de estadísticas
+  function handleLogin(loggedUser) {
+    setUser(loggedUser);
+    navigate('/');
+  }
+
   async function handleCreateMatch({ myIcons, oppIcons, ...rest }) {
-    // 1. Convertir los Pokémon elegidos en decks (los encuentra o los crea)
     const [mine, opp] = await Promise.all([
       api.resolveDeck(myIcons),
       api.resolveDeck(oppIcons),
     ]);
 
-    // 2. Si se creó un deck nuevo, agregarlo a la lista (para los filtros de estadísticas)
     for (const r of [mine, opp]) {
       if (r.created) {
         setDecks((prev) => (prev.some((d) => d.id === r.deck.id) ? prev : [...prev, r.deck]));
       }
     }
 
-    // 3. Guardar la partida con los ids de esos decks
     await api.createMatch({ my_deck_id: mine.deck.id, opp_deck_id: opp.deck.id, ...rest });
 
-    // 4. Recargar el historial
     const data = await api.getMatches();
     setMatches(data.matches);
   }
@@ -75,7 +79,7 @@ export default function App() {
   }
 
   if (loading) return <p className="center">Cargando...</p>;
-  if (!user) return <AuthForm onLogin={setUser} />;
+  if (!user) return <AuthForm onLogin={handleLogin} />;
 
   return (
     <div className="container">
@@ -91,13 +95,22 @@ export default function App() {
         </div>
       </header>
 
+      <nav className="main-nav">
+        <NavLink to="/" end>Estadísticas</NavLink>
+        <NavLink to="/partidas">Partidas</NavLink>
+        <NavLink to="/historial">Historial</NavLink>
+      </nav>
+
       {loadError && <p className="error">{loadError}</p>}
 
-      <div className="layout">
-        <MatchForm decks={decks} onSubmit={handleCreateMatch} />
-        <StatsPanel decks={decks} matches={matches} />
-        <MatchHistory matches={matches} onDelete={handleDeleteMatch} />
-      </div>
+      <main className="layout">
+        <Routes>
+          <Route path="/" element={<StatsPanel decks={decks} matches={matches} />} />
+          <Route path="/partidas" element={<MatchForm decks={decks} onSubmit={handleCreateMatch} />} />
+          <Route path="/historial" element={<MatchHistory matches={matches} onDelete={handleDeleteMatch} />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </main>
     </div>
   );
 }

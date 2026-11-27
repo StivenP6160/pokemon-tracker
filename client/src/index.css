@@ -242,3 +242,18 @@ img { max-width: 100%; }
   .stat-value { font-size: 1.6rem; }
   .rate-cell { min-width: 110px; }
 }
+
+/* ---------- Menú principal ---------- */
+.main-nav { display: flex; gap: 4px; margin-bottom: 20px; border-bottom: 1px solid var(--border); }
+.main-nav a {
+  padding: 10px 14px;
+  color: var(--muted);
+  text-decoration: none;
+  font-weight: 500;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+.main-nav a:hover { color: var(--text); }
+.main-nav a.active { color: var(--text); border-bottom-color: var(--accent); }
+
+.form-success { margin: 0; color: var(--win); font-size: 0.9rem; font-weight: 600; }

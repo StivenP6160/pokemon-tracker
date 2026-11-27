@@ -17,10 +17,12 @@ export default function MatchForm({ decks, onSubmit }) {
   const [notes, setNotes] = useState('');
   const [error, setError] = useState('');
   const [sending, setSending] = useState(false);
+  const [saved, setSaved] = useState(false);
 
   async function handleSubmit(e) {
     e.preventDefault();
     setError('');
+    setSaved(false);
 
     const mine = myIcons.filter(Boolean);
     const opp = oppIcons.filter(Boolean);
@@ -34,6 +36,7 @@ export default function MatchForm({ decks, onSubmit }) {
     setSending(true);
     try {
       await onSubmit({ myIcons: mine, oppIcons: opp, went_first: wentFirst, result, notes });
+      setSaved(true);
       // Limpia el formulario, pero deja tu deck (normalmente juegas el mismo)
       setOppIcons(EMPTY);
       setWentFirst(null);
@@ -101,6 +104,7 @@ export default function MatchForm({ decks, onSubmit }) {
         </label>
 
         {error && <p className="error">{error}</p>}
+        {saved && <p className="form-success">✅ Partida guardada</p>}
 
         <button type="submit" disabled={sending}>
           {sending ? 'Guardando...' : 'Guardar partida'}
