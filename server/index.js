@@ -7,6 +7,7 @@ import authRoutes from './routes/auth.js';
 import deckRoutes from './routes/decks.js';
 import matchRoutes from './routes/matches.js';
 import statsRoutes from './routes/stats.js';
+import myDeckRoutes from './routes/myDecks.js';
 
 if (!process.env.JWT_SECRET) {
   throw new Error('Falta JWT_SECRET en el archivo .env');
@@ -27,6 +28,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/decks', requireAuth, deckRoutes);
 app.use('/api/matches', requireAuth, matchRoutes);
 app.use('/api/stats', requireAuth, statsRoutes);
+app.use('/api/my-decks', requireAuth, myDeckRoutes);
 
 // Cualquier otra ruta /api que no exista → 404 en JSON
 app.use('/api', (req, res) => {

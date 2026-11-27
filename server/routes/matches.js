@@ -53,6 +53,11 @@ router.post('/', async (req, res) => {
      RETURNING *`,
     [req.user.id, my_deck_id, opp_deck_id, went_first, result, notes.trim()]
   );
+    // Tu deck entra en tu caja (si ya estaba, no pasa nada)
+  await pool.query(
+    'INSERT INTO user_decks (user_id, deck_id) VALUES ($1, $2) ON CONFLICT DO NOTHING',
+    [req.user.id, my_deck_id]
+  );
   res.status(201).json({ match: rows[0] });
 });
 
