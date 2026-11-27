@@ -45,3 +45,16 @@ CREATE TABLE IF NOT EXISTS meta_matchups (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   PRIMARY KEY (deck_a, deck_b)
 );
+
+-- Los decks que juega cada usuario (su "caja de decks")
+CREATE TABLE IF NOT EXISTS user_decks (
+  user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  deck_id    INTEGER NOT NULL REFERENCES decks(id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  PRIMARY KEY (user_id, deck_id)
+);
+
+-- Todo deck con el que el usuario ya registró partidas, entra en su caja
+INSERT INTO user_decks (user_id, deck_id)
+SELECT DISTINCT user_id, my_deck_id FROM matches
+ON CONFLICT DO NOTHING;
