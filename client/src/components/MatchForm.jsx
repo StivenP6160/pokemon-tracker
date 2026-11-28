@@ -9,8 +9,31 @@ const RESULTS = [
 ];
 
 const EMPTY = ['', ''];
+const MAX_RECENT = 5;
 
-export default function MatchForm({ activeDeck, decks, onSubmit }) {
+// Recorre las partidas (de la más nueva a la más vieja) y se queda
+// con los primeros 5 decks rivales distintos
+function getRecentRivals(matches) {
+  const seen = new Set();
+  const rivals = [];
+
+  for (const m of matches) {
+    if (seen.has(m.opp_deck_id)) continue; // ya lo tenemos, lo saltamos
+    seen.add(m.opp_deck_id);
+    rivals.push({ id: m.opp_deck_id, name: m.opp_deck, icons: m.opp_icons });
+    if (rivals.length === MAX_RECENT) break; // ya tenemos 5, paramos
+  }
+
+  return rivals;
+}
+
+// ¿El deck rival elegido ahora mismo tiene exactamente estos Pokémon?
+function isSelected(oppIcons, icons) {
+  const chosen = oppIcons.filter(Boolean);
+  return chosen.length === icons.length && chosen.every((x) => icons.includes(x));
+}
+
+export default function MatchForm({ activeDeck, decks, matches, onSubmit }) {
   const [oppIcons, setOppIcons] = useState(EMPTY);
   const [wentFirst, setWentFirst] = useState(null);
   const [result, setResult] = useState(null);
@@ -18,6 +41,14 @@ export default function MatchForm({ activeDeck, decks, onSubmit }) {
   const [error, setError] = useState('');
   const [sending, setSending] = useState(false);
   const [saved, setSaved] = useState(false);
+
+  const recentRivals = getRecentRivals(matches);
+
+  // Llena el buscador con los Pokémon del rival (siempre 2 casillas)
+  function pickRival(rival) {
+    setOppIcons([rival.icons[0] ?? '', rival.icons[1] ?? '']);
+    setSaved(false);
+  }
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -65,6 +96,26 @@ export default function MatchForm({ activeDeck, decks, onSubmit }) {
             <strong>{activeDeck.name}</strong>
           </span>
         </div>
+
+        {recentRivals.length > 0 && (
+          <fieldset>
+            <legend>Rivales recientes</legend>
+            <div className="toggle-group">
+              {recentRivals.map((rival) => (
+                <button
+                  key={rival.id}
+                  type="button"
+                  className={`toggle ${isSelected(oppIcons, rival.icons) ? 'active' : ''}`}
+                  onClick={() => pickRival(rival)}
+                  title={rival.name}
+                >
+                  <DeckIcons icons={rival.icons} />
+                  {rival.name}
+                </button>
+              ))}
+            </div>
+          </fieldset>
+        )}
 
         <DeckPicker label="Deck rival" icons={oppIcons} onChange={setOppIcons} decks={decks} />
 

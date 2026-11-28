@@ -31,6 +31,9 @@ export default function App() {
 
   const activeDeck = myDecks.find((d) => d.id === activeDeckId) ?? null;
 
+  // Solo las partidas jugadas con el deck activo (siguen ordenadas de la más nueva a la más vieja)
+  const activeMatches = matches.filter((m) => m.my_deck_id === activeDeckId);
+
   // 1. Al abrir la página: ¿ya había una sesión iniciada?
   useEffect(() => {
     api
@@ -172,14 +175,22 @@ export default function App() {
           />
           <Route
             path="/partidas"
-            element={<MatchForm key={activeDeckId} activeDeck={activeDeck} decks={decks} onSubmit={handleCreateMatch} />}
+            element={
+              <MatchForm
+                key={activeDeckId}
+                activeDeck={activeDeck}
+                decks={decks}
+                matches={activeMatches}
+                onSubmit={handleCreateMatch}
+              />
+            }
           />
           <Route
             path="/historial"
             element={
               <MatchHistory
                 deckName={activeDeck?.name}
-                matches={matches.filter((m) => m.my_deck_id === activeDeckId)}
+                matches={activeMatches}
                 onDelete={handleDeleteMatch}
               />
             }
